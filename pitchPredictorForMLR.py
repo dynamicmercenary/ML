@@ -48,10 +48,6 @@ X = df.drop(columns=["pitch", "paID", "season", "session", "gameID", "inningID",
 #X = df.drop(columns=["pitch"], inplace=True)
 X = df.drop(columns=string_columns)
 
-# Assuming you have a DataFrame 'df' with your data
-# Separate your labels (if necessary) and features
-# For this example, let's assume labels are in 'labels' and features are in 'features'
-
 # Standardize the features (recommended for PCA)
 
 scaler = StandardScaler()
