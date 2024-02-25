@@ -1,5 +1,6 @@
 import requests
 from bs4 import BeautifulSoup
+from urllib.parse import urljoin
 import time
 import subprocess
 
@@ -41,8 +42,33 @@ def send_notfication(recipients, url):
     subject = 'Ticket Available'
     body = f'Check the website: {url}'
 
-    msg = f"{subject}\n\n{body}"
+    try:
+        response = requests.get(url)
+        if response.status_code == 200:
+            soup = BeautifulSoup(response.text, 'html.parser')
 
+            if soup.find('a', class_='btn button_cphmarathon'):
+            
+                # Find the <a> tag with the class "btn button_cphmarathon" not tested.
+                a_tag = soup.find('a', class_='btn button_cphmarathon')
+
+                # Extract the href attribute
+                url_køb = a_tag['href']
+                new_url = 'https://secure.onreg.com/onreg2/bibexchange/'
+                full_url_køb = urljoin(new_url, url_køb)
+
+                body_køb = f'Or clik here to add to shopping bag directly (might not work): {full_url_køb}'
+
+                msg = f"{subject}\n\n{body} \n\n {body_køb}"
+
+            else:
+
+                msg = f"{subject}\n\n{body}"
+
+
+    except Exception as e:
+        print(f"Code run into an error: {e}")
+    
     for recipient in recipients:
         if not recipient:
             print("Recipient's phone number is not set")
