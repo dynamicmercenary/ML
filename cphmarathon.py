@@ -49,7 +49,7 @@ def send_notfication(recipients, url):
 
             if soup.find('a', class_='btn button_cphmarathon'):
             
-                # Find the <a> tag with the class "btn button_cphmarathon" not tested.
+                # Find the <a> tag with the class "btn button_cphmarathon" #not tested.
                 a_tag = soup.find('a', class_='btn button_cphmarathon')
 
                 # Extract the href attribute
