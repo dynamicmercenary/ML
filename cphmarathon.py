@@ -70,12 +70,10 @@ def send_notfication_without_phone(url):
                 url_køb = a_tag['href']
                 new_url = 'https://secure.onreg.com/onreg2/bibexchange/'
                 full_url_køb = urljoin(new_url, url_køb)
-                url_change = full_url_køb
-
+                
                 open_favourite_browser(full_url_køb)
 
             else:
-                url_change = url
                 open_favourite_browser(url)
                 
     except Exception as e:
@@ -84,11 +82,11 @@ def send_notfication_without_phone(url):
 
 def open_favourite_browser(url):
     global opened_browser
-    global url_change
     if not opened_browser:
         webbrowser.open(url)
         opened_browser = True
     elif not url == url_change:
+        url_change = url
         webbrowser.open(url)
     else: 
         print("Reload the browser")
