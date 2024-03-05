@@ -82,6 +82,7 @@ def send_notfication_without_phone(url):
 
 def open_favourite_browser(url):
     global opened_browser
+    global url_change
     if not opened_browser:
         webbrowser.open(url)
         opened_browser = True
