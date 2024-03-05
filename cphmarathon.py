@@ -55,6 +55,7 @@ def check_availability_without_phone():
         print(f"Code run into an error: {e}")
         
 def send_notfication_without_phone(url):
+    global url_change
     try:
         response = requests.get(url)
         if response.status_code == 200:
@@ -69,10 +70,12 @@ def send_notfication_without_phone(url):
                 url_køb = a_tag['href']
                 new_url = 'https://secure.onreg.com/onreg2/bibexchange/'
                 full_url_køb = urljoin(new_url, url_køb)
+                url_change = full_url_køb
 
                 open_favourite_browser(full_url_køb)
 
             else:
+                url_change = url
                 open_favourite_browser(url)
                 
     except Exception as e:
@@ -81,10 +84,13 @@ def send_notfication_without_phone(url):
 
 def open_favourite_browser(url):
     global opened_browser
+    global url_change
     if not opened_browser:
         webbrowser.open(url)
         opened_browser = True
-    else:
+    elif not url == url_change:
+        webbrowser.open(url)
+    else: 
         print("Reload the browser")
     
 
@@ -139,6 +145,7 @@ if __name__ == "__main__":
     if not recipients == []:
         test_connection(recipients)
     counter = 0
+    url_change = None
     opened_browser = False
     while (True):
         if counter > 0:
