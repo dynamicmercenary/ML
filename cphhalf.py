@@ -3,6 +3,7 @@ from bs4 import BeautifulSoup
 from urllib.parse import urljoin
 import time
 import subprocess
+import webbrowser
 
 def test_connection(recipients):
     msg = """The is a test for connection to your number. \n \n You'll be notified if a ticket is available"""
@@ -34,7 +35,60 @@ def check_availability(recipients):
                 send_notfication(recipients, url)
     except Exception as e:
         print(f"Code run into an error: {e}")
+        
+def check_availability_without_phone():
+    url = "https://secure.onreg.com/onreg2/bibexchange/?eventid=6277" 
+    response = requests.get(url)
+    try:
+        if response.status_code == 200:
+            soup = BeautifulSoup(response.text, 'html.parser')
+            #This string will be removed when a ticket is available
+            unavailable_text = "Der er ikke nogen startnumre til salg i øjeblikket. Prøv igen lidt senere."
+
+            if unavailable_text not in soup.text:
+                with open('downloaded_html.html', 'w', encoding='utf-8') as f_out:
+                    f_out.write(soup.prettify())
+                    send_notfication_without_phone(url)
+    except Exception as e:
+        print(f"Code run into an error: {e}")
+        
+def send_notfication_without_phone(url):
+    global url_change
+    try:
+        response = requests.get(url)
+        if response.status_code == 200:
+            soup = BeautifulSoup(response.text, 'html.parser')
+
+            if soup.find('a', class_='btn button_cphhalf'):
+            
+                # Find the <a> tag with the class "btn button_cphmarathon" #not tested.
+                a_tag = soup.find('a', class_='btn button_cphhalf')
+
+                # Extract the href attribute
+                url_køb = a_tag['href']
+                new_url = 'https://secure.onreg.com/onreg2/bibexchange/'
+                full_url_køb = urljoin(new_url, url_køb)
+                
+                open_favourite_browser(full_url_køb)
+
+            else:
+                open_favourite_browser(url)
+                
+    except Exception as e:
+        print(f"Code run into an error: {e}")
     
+
+def open_favourite_browser(url):
+    global opened_browser
+    global url_change
+    if not opened_browser:
+        webbrowser.open(url)
+        opened_browser = True
+    elif not url == url_change:
+        url_change = url
+        webbrowser.open(url)
+    else: 
+        print("Reload the browser")
 
 def send_notfication(recipients, url):
     subject = 'Ticket Available'
@@ -81,16 +135,21 @@ def send_notfication(recipients, url):
         subprocess.run(['osascript', '-e', applescript])
 
 if __name__ == "__main__":
-    recipients = [] #Add you phone number here as a string
+    recipients = [] #Add you phone number here as a string, only MacBook to iPhone
 
     print("Running script")
-    test_connection(recipients)
+    if not recipients == []:
+        test_connection(recipients)
     counter = 0
+    url_change = None
+    opened_browser = False
     while (True):
         if counter > 0:
             print(f"Running counter: {counter} times")
         counter += 1
-        if counter % 700 == 0:
-            test_connection(recipients)
-        check_availability(recipients)
-        time.sleep(60)  # wait before checking again
+        if not recipients == []:
+            check_availability(recipients)
+        else: 
+            check_availability_without_phone()
+        time.sleep(3)  #wait before checking again
+
